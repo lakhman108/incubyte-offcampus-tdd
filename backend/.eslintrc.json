@@ -1,0 +1,21 @@
+{
+  "env": {
+    "node": true,
+    "es2021": true,
+    "jest": true
+  },
+  "extends": [
+    "airbnb-base",
+    "prettier"
+  ],
+  "plugins": ["prettier"],
+  "parserOptions": {
+    "ecmaVersion": 2021
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "no-console": "off",
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }],
+    "func-names": "off"
+  }
+}
