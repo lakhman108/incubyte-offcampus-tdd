@@ -37,5 +37,36 @@ describe('Auth Endpoints', () => {
       expect(res.body.user).toHaveProperty('email', userData.email);
       expect(res.body.user).not.toHaveProperty('password');
     });
+
+    it('should return 400 when email is missing', async () => {
+      const userData = {
+        username: 'testuser',
+        password: 'password123'
+      };
+
+      const res = await request(app).post('/api/auth/register').send(userData);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('error');
+    });
+
+    test('should return 400 when password is missing', async () => {
+      const response = await request(app).post('/api/auth/register').send({
+        username: 'john',
+        email: 'john@example.com'
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('error');
+    });
+    test('should return 400 when username is missing', async () => {
+      const response = await request(app).post('/api/auth/register').send({
+        email: 'john@example.com',
+        password: 'password123'
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('error');
+    });
   });
 });
