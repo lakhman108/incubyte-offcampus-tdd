@@ -1,17 +1,15 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const { connectDB, clearDB, closeDB } = require('../config/db');
 
 describe('User Model', () => {
   beforeAll(async () => {
-    // Connect to test Database
-    const uri =
-      process.env.MONGODB_URI || 'mongodb://localhost:27017/sweetshop_test';
-    await mongoose.connect(uri);
+    await connectDB();
   });
 
   afterAll(async () => {
-    await mongoose.connection.dropDatabase();
-    await mongoose.connection.close();
+    await clearDB();
+    await closeDB();
   });
 
   afterEach(async () => {
