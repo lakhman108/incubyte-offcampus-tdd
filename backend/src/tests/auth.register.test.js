@@ -71,12 +71,29 @@ describe('Auth Endpoints', () => {
 
     test('should return 400 when invalid mail is provided', async () => {
       const response = await request(app).post('/api/auth/register').send({
-        name: 'john',
+        username: 'john',
         email: 'john#example.com',
         password: 'password123'
       });
 
       expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('error');
+    });
+
+    test('should return 409 for duplicate email', async () => {
+      await request(app).post('/api/auth/register').send({
+        username: 'john1',
+        email: 'john@gmail.com',
+        password: 'password@123'
+      });
+
+      const response = await request(app).post('/api/auth/register').send({
+        username: 'john2',
+        email: 'john@gmail.com',
+        password: 'password@123'
+      });
+
+      expect(response.status).toBe(409);
       expect(response.body).toHaveProperty('error');
     });
   });
