@@ -11,6 +11,15 @@ const register = async (req, res) => {
       });
     }
 
+    // Check if user is already exists
+    const existingUser = await User.findOne({ email: email });
+
+    if (existingUser !== null) {
+      return res.status(409).send({
+        error: 'already exists'
+      });
+    }
+
     const user = new User({ username, email, password });
     await user.save();
 
