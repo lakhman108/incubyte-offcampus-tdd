@@ -1,0 +1,24 @@
+{
+  "name": "incubyte-offcampus-tdd",
+  "version": "1.0.0",
+  "description": "As part of the first round of the Incubyte Off-Campus Placement Drive, I developed a Sweet Shop Management System following a Test-Driven Development (TDD) approach",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lakhman108/incubyte-offcampus-tdd.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lakhman108/incubyte-offcampus-tdd/issues"
+  },
+  "homepage": "https://github.com/lakhman108/incubyte-offcampus-tdd#readme",
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
