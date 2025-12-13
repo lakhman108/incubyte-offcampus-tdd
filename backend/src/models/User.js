@@ -25,7 +25,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters long'],
-      maxlength: [20, 'Password must be at most 20 characters long']
+      maxlength: [20, 'Password must be at most 20 characters long'],
+      select:false
     },
     role: {
       type: String,
@@ -40,10 +41,14 @@ const userSchema = new mongoose.Schema(
 
 const salt_rounds = 12;
 
+// Indexes for better performance 
+userSchema.index({email:1});
+userSchema.index({username:1});
+
 // Hash password before saving
-userSchema.pre('save', async function (next) {
-   if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password,salt_rounds);
+userSchema.pre('save', async function () {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, salt_rounds);
   }
 });
 
