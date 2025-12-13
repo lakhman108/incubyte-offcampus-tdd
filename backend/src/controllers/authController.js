@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const validateRegistration = require('../utils/validators');
+
 const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -12,7 +13,7 @@ const register = async (req, res) => {
     }
 
     // Check if user is already exists
-    const existingUser = await User.findOne({ email: email });
+    const existingUser = await User.findOne({ email });
 
     if (existingUser !== null) {
       return res.status(409).send({
@@ -36,7 +37,7 @@ const register = async (req, res) => {
       user: userResponse
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Server error during registration'
     });
   }

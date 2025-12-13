@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Sweet = require('../models/Sweet');
 const { connectDB, clearDB, closeDB } = require('../config/db');
 

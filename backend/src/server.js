@@ -19,7 +19,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-//Authentication routes
+// Authentication routes
 app.use('/api/auth', authRoutes);
 
 // Only start server if not in test environment

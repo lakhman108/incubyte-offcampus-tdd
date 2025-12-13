@@ -30,3 +30,4 @@ logs/
 npm-debug.log*
 
 *.txt
+.kiro/

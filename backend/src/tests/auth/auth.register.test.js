@@ -1,7 +1,7 @@
 const request = require('supertest');
-const app = require('../server');
-const User = require('../models/User');
-const { connectDB, clearDB, closeDB } = require('../config/db');
+const app = require('../../server');
+const User = require('../../models/User');
+const { connectDB, clearDB, closeDB } = require('../../config/db');
 
 describe('Auth Endpoints', () => {
   beforeAll(async () => {
