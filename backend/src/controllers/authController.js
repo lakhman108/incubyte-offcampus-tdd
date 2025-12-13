@@ -13,6 +13,12 @@ const register = async (req, res) => {
       });
     }
 
+    //email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: 'Invalid email' });
+    }
+
     await user.save();
     const userResponse = {
       _id: user._id,
