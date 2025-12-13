@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters long'],
       maxlength: [20, 'Password must be at most 20 characters long'],
-      select:false
+      select: false
     },
     role: {
       type: String,
@@ -41,9 +41,9 @@ const userSchema = new mongoose.Schema(
 
 const salt_rounds = 12;
 
-// Indexes for better performance 
-userSchema.index({email:1});
-userSchema.index({username:1});
+// Indexes for better performance
+userSchema.index({ email: 1 });
+userSchema.index({ username: 1 });
 
 // Hash password before saving
 userSchema.pre('save', async function () {
