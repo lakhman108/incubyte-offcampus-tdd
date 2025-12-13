@@ -1,7 +1,13 @@
 const express = require('express');
-
 const app = express();
 
-// No routes implemented yet - this will make our test fail
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'server is running',
+  });
+});
+
 
 module.exports = app;
