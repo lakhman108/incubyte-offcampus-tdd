@@ -64,35 +64,34 @@ describe('User Model', () => {
     expect(savedUser.role).toBe('customer');
   });
 
-it('should hash password before saving', async () => {
-  const userData = {
-    username: 'testuser',
-    email: 'test@example.com',
-    password: 'password123',
-  };
+  it('should hash password before saving', async () => {
+    const userData = {
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'password123'
+    };
 
-  const user = new User(userData);
-  const savedUser = await user.save();
+    const user = new User(userData);
+    const savedUser = await user.save();
 
-  expect(savedUser.password).not.toBe(userData.password);
-  expect(savedUser.password.length).toBeGreaterThan(userData.password.length);
-});
+    expect(savedUser.password).not.toBe(userData.password);
+    expect(savedUser.password.length).toBeGreaterThan(userData.password.length);
+  });
 
-it('should compare password correctly', async () => {
-  const userData = {
-    username: 'testuser',
-    email: 'test@example.com',
-    password: 'password123',
-  };
+  it('should compare password correctly', async () => {
+    const userData = {
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'password123'
+    };
 
-  const user = new User(userData);
-  const savedUser = await user.save();
+    const user = new User(userData);
+    const savedUser = await user.save();
 
-  const isMatch = await savedUser.comparePassword('password123');
-  const isNotMatch = await savedUser.comparePassword('wrongpassword');
+    const isMatch = await savedUser.comparePassword('password123');
+    const isNotMatch = await savedUser.comparePassword('wrongpassword');
 
-  expect(isMatch).toBe(true);
-  expect(isNotMatch).toBe(false);
-});
-
+    expect(isMatch).toBe(true);
+    expect(isNotMatch).toBe(false);
+  });
 });
