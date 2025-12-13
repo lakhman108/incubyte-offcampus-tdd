@@ -68,5 +68,16 @@ describe('Auth Endpoints', () => {
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty('error');
     });
+
+    test('should return 400 when invalid mail is provided', async () => {
+      const response = await request(app).post('/api/auth/register').send({
+        name: 'john',
+        email: 'john#example.com',
+        password: 'password123'
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('error');
+    });
   });
 });
