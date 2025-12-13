@@ -4,6 +4,7 @@ const { connectDB, clearDB, closeDB } = require('../config/db');
 describe('User Model', () => {
   beforeAll(async () => {
     await connectDB();
+    await User.init(); // Ensure indexes are created
   });
 
   afterAll(async () => {

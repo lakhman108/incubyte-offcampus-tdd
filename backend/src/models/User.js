@@ -42,8 +42,6 @@ const userSchema = new mongoose.Schema(
 const salt_rounds = 12;
 
 // Indexes for better performance
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
 
 // Hash password before saving
 userSchema.pre('save', async function () {
