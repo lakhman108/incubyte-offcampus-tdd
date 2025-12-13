@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const validateRegistration = require('../utils/validators');
+const { signToken } = require('../utils/tokengenerator');
 
 const register = async (req, res) => {
   try {
@@ -74,11 +74,7 @@ const login = async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '24h' }
-    );
+    const token = signToken(user);
 
     // Return user without password
     const userResponse = {
