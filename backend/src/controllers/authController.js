@@ -1,25 +1,19 @@
 const User = require('../models/User');
-
+const validateRegistration = require('../utils/validators');
 const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    const user = new User({ username, email, password });
-
-    //validate required field
-    if (!username || !email || !password) {
-      return res.status(400).json({
-        error: 'Username,email and password are required'
+    const validationError = validateRegistration(username, email, password);
+    if (validationError !== null) {
+      return res.status(400).send({
+        error: validationError
       });
     }
 
-    //email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Invalid email' });
-    }
-
+    const user = new User({ username, email, password });
     await user.save();
+
     const userResponse = {
       _id: user._id,
       username: user.username,
