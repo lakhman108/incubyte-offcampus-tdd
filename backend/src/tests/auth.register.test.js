@@ -96,5 +96,27 @@ describe('Auth Endpoints', () => {
       expect(response.status).toBe(409);
       expect(response.body).toHaveProperty('error');
     });
+
+    test('should return 400 password length is less than 6', async () => {
+      const response = await request(app).post('/api/auth/register').send({
+        username: 'john',
+        email: 'john@example.com',
+        password: 'passw'
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('error');
+    });
+
+    test('should return 400 password length is greater than 20', async () => {
+      const response = await request(app).post('/api/auth/register').send({
+        username: 'john',
+        email: 'john@example.com',
+        password: 'passwpasswpasswpassw1'
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('error');
+    });
   });
 });
