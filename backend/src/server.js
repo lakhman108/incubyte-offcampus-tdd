@@ -31,4 +31,10 @@ if (process.env.NODE_ENV !== 'test') {
   });
 }
 
+app.use('/', (req, res) => {
+  res.status(200).send({
+    todo: 'frontend'
+  });
+});
+
 module.exports = app;
