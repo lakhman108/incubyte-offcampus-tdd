@@ -1,6 +1,6 @@
 const Sweet = require('../models/Sweet');
 const { buildSearchQuery } = require('../utils/querybuilder');
-const { validateSweet } = require('../utils/validators');
+const { validateSweet, validateSweetUpdate } = require('../utils/validators');
 
 const createSweet = async (req, res) => {
   try {
@@ -54,24 +54,10 @@ const updateSweets = async (req, res) => {
       });
     }
 
-    // Check if price is provided and is negative
-    if (price !== undefined && price < 0) {
+    const updateValidationError = validateSweetUpdate(price, quantity);
+    if (updateValidationError !== null) {
       return res.status(400).send({
-        error: 'Price cannot be negative'
-      });
-    }
-
-    // Check if quantity is provided and is negative
-    if (quantity !== undefined && quantity < 0) {
-      return res.status(400).send({
-        error: 'Quantity cannot be negative'
-      });
-    }
-
-    // Check if quantity is provided and is not an integer
-    if (quantity !== undefined && !Number.isInteger(quantity)) {
-      return res.status(400).send({
-        error: 'Quantity must be an integer'
+        error: updateValidationError
       });
     }
 

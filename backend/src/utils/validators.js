@@ -27,4 +27,22 @@ const validateSweet = (name, category, price, quantity) => {
   return null;
 };
 
-module.exports = { validateRegistration, validateSweet };
+const validateSweetUpdate = (price, quantity) => {
+  // Check if price is provided and is negative
+  if (price !== undefined && price < 0) {
+    return 'Price cannot be negative';
+  }
+
+  // Check if quantity is provided and is negative
+  if (quantity !== undefined && quantity < 0) {
+    return 'Quantity cannot be negative';
+  }
+
+  // Check if quantity is provided and is not an integer
+  if (quantity !== undefined && !Number.isInteger(quantity)) {
+    return 'Quantity must be an integer';
+  }
+
+  return null;
+};
+module.exports = { validateRegistration, validateSweet, validateSweetUpdate };
