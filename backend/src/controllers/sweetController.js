@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Sweet = require('../models/Sweet');
 const { buildSearchQuery } = require('../utils/querybuilder');
 const { validateSweet, validateSweetUpdate } = require('../utils/validators');
@@ -80,4 +81,32 @@ const updateSweets = async (req, res) => {
   }
 };
 
-module.exports = { createSweet, getAllSweets, searchSweets, updateSweets };
+const deleteSweet = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid sweet ID' });
+    }
+
+    const sweet = await Sweet.findByIdAndDelete(id);
+
+    if (!sweet) {
+      return res.status(404).json({ message: 'Sweet not found' });
+    }
+
+    return res.json({ message: 'Sweet deleted successfully' });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: 'Server error', error: error.message });
+  }
+};
+
+module.exports = {
+  createSweet,
+  getAllSweets,
+  searchSweets,
+  updateSweets,
+  deleteSweet
+};
