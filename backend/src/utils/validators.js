@@ -45,4 +45,23 @@ const validateSweetUpdate = (price, quantity) => {
 
   return null;
 };
-module.exports = { validateRegistration, validateSweet, validateSweetUpdate };
+
+const validateStock = (sweet, requestedQuantity) => {
+  if (sweet.quantity === 0) {
+    return { valid: false, error: 'Sweet is out of stock' };
+  }
+  if (sweet.quantity < requestedQuantity) {
+    return {
+      valid: false,
+      error: `Insufficient stock. Only ${sweet.quantity} available`
+    };
+  }
+  return { valid: true };
+};
+
+module.exports = {
+  validateRegistration,
+  validateSweet,
+  validateSweetUpdate,
+  validateStock
+};

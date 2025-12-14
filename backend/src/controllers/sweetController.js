@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 const Sweet = require('../models/Sweet');
 const { buildSearchQuery } = require('../utils/querybuilder');
-const { validateSweet, validateSweetUpdate } = require('../utils/validators');
+const {
+  validateSweet,
+  validateSweetUpdate,
+  validateStock
+} = require('../utils/validators');
 
 const createSweet = async (req, res) => {
   try {
@@ -117,28 +121,19 @@ const purchaseSweet = async (req, res) => {
     }
 
     const sweet = await Sweet.findById(id);
-
     if (!sweet) {
       return res.status(404).json({ error: 'Sweet not found' });
     }
 
-    if (sweet.quantity === 0) {
-      return res.status(400).json({ error: 'Sweet is out of stock' });
-    }
-
-    if (sweet.quantity < quantity) {
-      return res.status(400).json({
-        error: `Insufficient stock. Only ${sweet.quantity} available`
-      });
+    const stockValidation = validateStock(sweet, quantity);
+    if (!stockValidation.valid) {
+      return res.status(400).json({ error: stockValidation.error });
     }
 
     sweet.quantity -= quantity;
     await sweet.save();
 
-    return res.json({
-      message: 'Purchase successful',
-      sweet
-    });
+    return res.json({ message: 'Purchase successful', sweet });
   } catch (error) {
     return res
       .status(500)
