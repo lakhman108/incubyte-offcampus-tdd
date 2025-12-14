@@ -41,4 +41,57 @@ const searchSweets = async (req, res) => {
   }
 };
 
-module.exports = { createSweet, getAllSweets, searchSweets };
+const updateSweets = async (req, res) => {
+  try {
+    const sweetId = req.params.id;
+    const { name, category, price, quantity } = req.body;
+
+    const existingSweet = await Sweet.findById(sweetId);
+
+    if (existingSweet === null) {
+      return res.status(404).send({
+        error: 'sweet does not exist'
+      });
+    }
+
+    // Check if price is provided and is negative
+    if (price !== undefined && price < 0) {
+      return res.status(400).send({
+        error: 'Price cannot be negative'
+      });
+    }
+
+    // Check if quantity is provided and is negative
+    if (quantity !== undefined && quantity < 0) {
+      return res.status(400).send({
+        error: 'Quantity cannot be negative'
+      });
+    }
+
+    // Check if quantity is provided and is not an integer
+    if (quantity !== undefined && !Number.isInteger(quantity)) {
+      return res.status(400).send({
+        error: 'Quantity must be an integer'
+      });
+    }
+
+    existingSweet.name = name || existingSweet.name;
+    existingSweet.category = category || existingSweet.category;
+    existingSweet.price = price || existingSweet.price;
+    existingSweet.quantity = quantity || existingSweet.quantity;
+
+    await existingSweet.save();
+
+    return res.status(200).json({
+      message: 'Sweet updated successfully',
+      data: existingSweet
+    });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: 'Server error', error: error.message });
+  }
+};
+
+module.exports = { createSweet, getAllSweets, searchSweets, updateSweets };
