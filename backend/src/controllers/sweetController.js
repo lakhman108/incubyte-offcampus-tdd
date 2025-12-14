@@ -19,4 +19,13 @@ const createSweet = async (req, res) => {
   }
 };
 
-module.exports = { createSweet };
+const getAllSweets = async (req, res) => {
+  try {
+    const sweets = await Sweet.find({});
+    return res.status(200).json(sweets);
+  } catch (error) {
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
+
+module.exports = { createSweet, getAllSweets };
