@@ -1,4 +1,5 @@
 const Sweet = require('../models/Sweet');
+const { buildSearchQuery } = require('../utils/querybuilder');
 const { validateSweet } = require('../utils/validators');
 
 const createSweet = async (req, res) => {
@@ -28,4 +29,16 @@ const getAllSweets = async (req, res) => {
   }
 };
 
-module.exports = { createSweet, getAllSweets };
+const searchSweets = async (req, res) => {
+  try {
+    const { name, category, minPrice, maxPrice } = req.query;
+    const query = buildSearchQuery(name, category, minPrice, maxPrice);
+
+    const sweets = await Sweet.find(query);
+    res.json(sweets);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+module.exports = { createSweet, getAllSweets, searchSweets };
