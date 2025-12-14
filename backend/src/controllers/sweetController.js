@@ -103,10 +103,54 @@ const deleteSweet = async (req, res) => {
   }
 };
 
+const purchaseSweet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid sweet ID' });
+    }
+
+    if (!quantity || quantity <= 0) {
+      return res.status(400).json({ error: 'Quantity must be greater than 0' });
+    }
+
+    const sweet = await Sweet.findById(id);
+
+    if (!sweet) {
+      return res.status(404).json({ error: 'Sweet not found' });
+    }
+
+    if (sweet.quantity === 0) {
+      return res.status(400).json({ error: 'Sweet is out of stock' });
+    }
+
+    if (sweet.quantity < quantity) {
+      return res.status(400).json({
+        error: `Insufficient stock. Only ${sweet.quantity} available`
+      });
+    }
+
+    sweet.quantity -= quantity;
+    await sweet.save();
+
+    return res.json({
+      message: 'Purchase successful',
+      sweet
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: 'Server error', message: error.message });
+  }
+};
+
 module.exports = {
   createSweet,
   getAllSweets,
   searchSweets,
   updateSweets,
-  deleteSweet
+  deleteSweet,
+  purchaseSweet
 };
