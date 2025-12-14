@@ -2,6 +2,7 @@ const express = require('express');
 require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
+const sweetRoutes = require('./routes/sweetRoutes');
 const { connectDB } = require('./config/db');
 
 const app = express();
@@ -21,7 +22,7 @@ app.get('/health', (req, res) => {
 
 // Authentication routes
 app.use('/api/auth', authRoutes);
-
+app.use('/api/sweets', sweetRoutes);
 // Only start server if not in test environment
 if (process.env.NODE_ENV !== 'test') {
   connectDB();
