@@ -1,4 +1,3 @@
-// backend/src/tests/sweets/sweets.api.test.js
 const request = require('supertest');
 const app = require('../../server');
 const { signToken } = require('../../utils/tokengenerator');

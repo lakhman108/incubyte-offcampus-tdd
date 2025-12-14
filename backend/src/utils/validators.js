@@ -15,4 +15,16 @@ const validateRegistration = (username, email, password) => {
   return null;
 };
 
-module.exports = validateRegistration;
+const validateSweet = (name, category, price, quantity) => {
+  if (!name) return 'Name is required';
+  if (!category) return 'Category is required';
+  if (!price) return 'Price is required';
+  if (!quantity) return 'Quantity is required';
+  if (price < 0) return 'Price cannot be negative';
+  if (quantity < 0) return 'Quantity cannot be negative';
+  if (!Number.isInteger(quantity)) return 'Quantity must be an integer';
+
+  return null;
+};
+
+module.exports = { validateRegistration, validateSweet };

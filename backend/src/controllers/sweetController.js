@@ -1,24 +1,15 @@
-const jwt = require('jsonwebtoken');
 const Sweet = require('../models/Sweet');
+const { validateSweet } = require('../utils/validators');
 
 const createSweet = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'No token provided' });
-    }
-
-    const token = authHeader.split(' ')[1];
-
-    try {
-      console.log(token);
-      jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-
     const { name, category, price, quantity } = req.body;
+    const validationError = validateSweet(name, category, price, quantity);
+    if (validationError !== null) {
+      return res.status(400).send({
+        error: validationError
+      });
+    }
     const sweet = await Sweet.create({ name, category, price, quantity });
     return res.status(201).json(sweet);
   } catch (error) {
