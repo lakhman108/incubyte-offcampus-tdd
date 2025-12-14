@@ -141,11 +141,47 @@ const purchaseSweet = async (req, res) => {
   }
 };
 
+const restockSweet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid sweet ID' });
+    }
+
+    if (!quantity || quantity <= 0 || !Number.isInteger(quantity)) {
+      return res.status(400).json({
+        error: 'Quantity must be a positive integer'
+      });
+    }
+
+    const sweet = await Sweet.findById(id);
+
+    if (!sweet) {
+      return res.status(404).json({ error: 'Sweet not found' });
+    }
+
+    sweet.quantity += quantity;
+    await sweet.save();
+
+    return res.json({
+      message: 'Restock successful',
+      sweet
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: 'Server error', message: error.message });
+  }
+};
+
 module.exports = {
   createSweet,
   getAllSweets,
   searchSweets,
   updateSweets,
   deleteSweet,
-  purchaseSweet
+  purchaseSweet,
+  restockSweet
 };
