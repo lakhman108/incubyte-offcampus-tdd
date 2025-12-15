@@ -77,7 +77,6 @@ Comprehensive test suite with **11 test suites** covering:
 | POST | `/api/sweets` | ✅ | All | Create a new sweet |
 | GET | `/api/sweets` | ✅ | All | Get all sweets |
 | GET | `/api/sweets/search` | ✅ | All | Search sweets by name, category, or price |
-| GET | `/api/sweets/:id` | ✅ | All | Get a specific sweet by ID |
 | PUT | `/api/sweets/:id` | ✅ | All | Update sweet details |
 | DELETE | `/api/sweets/:id` | ✅ | Admin | Delete a sweet |
 | POST | `/api/sweets/:id/purchase` | ✅ | All | Purchase a sweet (decrease quantity) |
