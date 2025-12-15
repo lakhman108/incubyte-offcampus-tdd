@@ -32,7 +32,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-center mb-6">Login to Sweet Shop</h2>
+          <h2 className="text-5xl font-black text-center mb-6 tracking-tight">Login to Sweet Shop</h2>
 
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm">

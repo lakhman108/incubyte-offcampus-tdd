@@ -1,7 +1,10 @@
 export interface User {
   _id: string;
+  username: string;
   email: string;
   role: 'customer' | 'admin';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Sweet {
@@ -10,9 +13,13 @@ export interface Sweet {
   category: string;
   price: number;
   quantity: number;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AuthResponse {
+  message: string;
   token: string;
   user: User;
 }
@@ -23,6 +30,7 @@ export interface LoginCredentials {
 }
 
 export interface RegisterData {
+  username: string;
   email: string;
   password: string;
   role?: 'customer' | 'admin';

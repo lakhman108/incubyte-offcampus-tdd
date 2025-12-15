@@ -126,10 +126,10 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">🍬 Admin Dashboard</h1>
+          <h1 className="text-5xl font-black tracking-tight">🍬 Admin Dashboard</h1>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">
-              {user?.email} ({user?.role})
+            <span className="text-xs font-light tracking-wide uppercase">
+              {user?.username || user?.email} ({user?.role})
             </span>
             <Button onClick={() => navigate('/dashboard')} variant="outline">
               Customer View
@@ -163,7 +163,7 @@ export default function AdminDashboard() {
 
         {(showCreateForm || editingSweet) && (
           <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold mb-4">
+            <h2 className="text-3xl font-black mb-4">
               {editingSweet ? 'Edit Sweet' : 'Create New Sweet'}
             </h2>
             <form onSubmit={editingSweet ? handleUpdate : handleCreate} className="space-y-4">

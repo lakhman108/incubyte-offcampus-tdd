@@ -44,6 +44,11 @@ export const sweetsAPI = {
       headers: { Authorization: `Bearer ${token}` },
     }),
 
+  getById: (token: string, id: string) =>
+    fetchAPI(`/sweets/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+
   search: (token: string, query: string) =>
     fetchAPI(`/sweets/search?${query}`, {
       headers: { Authorization: `Bearer ${token}` },

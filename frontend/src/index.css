@@ -3,6 +3,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+* {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+code, pre, input[type="number"], .mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
