@@ -1,7 +1,6 @@
 
 import type { Sweet } from '../types';
 import { Button } from './ui/button';
-import { useState } from 'react';
 
 interface SweetCardProps {
     sweet: Sweet;
@@ -9,7 +8,6 @@ interface SweetCardProps {
     onEdit?: (sweet: Sweet) => void;
     purchaseQuantity: number;
     setPurchaseQuantity: (qty: number) => void;
-    isAdmin?: boolean;
 }
 
 export default function SweetCard({
@@ -18,9 +16,7 @@ export default function SweetCard({
     onEdit,
     purchaseQuantity,
     setPurchaseQuantity,
-    isAdmin = false
 }: SweetCardProps) {
-    const [isHovered, setIsHovered] = useState(false);
 
     // Generate a deterministic gradient based on the sweet name
     const getGradient = (name: string) => {
@@ -39,11 +35,7 @@ export default function SweetCard({
     const isOutOfStock = sweet.quantity === 0;
 
     return (
-        <div
-            className="group relative h-full"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
+        <div className="group relative h-full">
             <div className={`
         relative h-full overflow-hidden rounded-3xl bg-card border border-white/5 shadow-lg 
         transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2
