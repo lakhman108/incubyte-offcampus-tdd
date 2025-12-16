@@ -1,19 +1,24 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { sweetsAPI } from '../services/api';
-import { Button } from '../components/ui/button';
 import type { Sweet } from '../types';
+import Layout from '../components/Layout';
+import SweetCard from '../components/SweetCard';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/Input';
+import { useAuth } from '../context/AuthContext';
 
 export default function DashboardPage() {
   const [sweets, setSweets] = useState<Sweet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Search States
   const [searchName, setSearchName] = useState('');
   const [searchCategory, setSearchCategory] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
-  const [purchaseQuantity, setPurchaseQuantity] = useState<{ [key: string]: number }>({});
+
+  // CRUD States
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingSweet, setEditingSweet] = useState<Sweet | null>(null);
   const [formData, setFormData] = useState({
@@ -22,8 +27,11 @@ export default function DashboardPage() {
     price: '',
     quantity: '',
   });
-  const { user, token, logout } = useAuth();
-  const navigate = useNavigate();
+
+  // Purchase State
+  const [purchaseQuantity, setPurchaseQuantity] = useState<{ [key: string]: number }>({});
+
+  const { token } = useAuth();
 
   const fetchSweets = async () => {
     if (!token) return;
@@ -48,7 +56,7 @@ export default function DashboardPage() {
       if (searchCategory) params.append('category', searchCategory);
       if (minPrice) params.append('minPrice', minPrice);
       if (maxPrice) params.append('maxPrice', maxPrice);
-      
+
       const data = await sweetsAPI.search(token, params.toString());
       setSweets(data);
       setError('');
@@ -59,13 +67,12 @@ export default function DashboardPage() {
     }
   };
 
-  const handlePurchase = async (sweetId: string) => {
+  const handlePurchase = async (sweetId: string, quantity: number) => {
     if (!token) return;
-    const quantity = purchaseQuantity[sweetId] || 1;
     try {
       await sweetsAPI.purchase(token, sweetId, quantity);
       fetchSweets();
-      setPurchaseQuantity({ ...purchaseQuantity, [sweetId]: 1 });
+      setPurchaseQuantity(prev => ({ ...prev, [sweetId]: 1 }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Purchase failed');
     }
@@ -83,7 +90,6 @@ export default function DashboardPage() {
       });
       setFormData({ name: '', category: '', price: '', quantity: '' });
       setShowCreateForm(false);
-      setError('');
       fetchSweets();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create sweet');
@@ -102,7 +108,6 @@ export default function DashboardPage() {
       });
       setFormData({ name: '', category: '', price: '', quantity: '' });
       setEditingSweet(null);
-      setError('');
       fetchSweets();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update sweet');
@@ -118,16 +123,22 @@ export default function DashboardPage() {
       quantity: sweet.quantity.toString(),
     });
     setShowCreateForm(false);
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const cancelEdit = () => {
     setEditingSweet(null);
     setFormData({ name: '', category: '', price: '', quantity: '' });
+    setShowCreateForm(false);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const clearFilters = () => {
+    setSearchName('');
+    setSearchCategory('');
+    setMinPrice('');
+    setMaxPrice('');
+    fetchSweets();
   };
 
   useEffect(() => {
@@ -135,105 +146,81 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-5xl font-black tracking-tight">🍬 Sweet Shop</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-xs font-light tracking-wide uppercase">
-              {user?.username || user?.email} ({user?.role})
-            </span>
-            {user?.role === 'admin' && (
-              <Button onClick={() => navigate('/admin')} variant="outline">
-                Admin Panel
-              </Button>
-            )}
-            <Button onClick={handleLogout} variant="outline">
-              Logout
-            </Button>
-          </div>
-        </div>
-      </nav>
+    <Layout>
+      <div className="space-y-8">
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded mb-4">
-            {error}
-            <button onClick={() => setError('')} className="ml-2 font-bold">×</button>
-          </div>
-        )}
-
-        <div className="mb-6">
+        {/* Toggle Create Form Button */}
+        <div className="flex justify-end">
           <Button
             onClick={() => {
               setShowCreateForm(!showCreateForm);
               setEditingSweet(null);
               setFormData({ name: '', category: '', price: '', quantity: '' });
             }}
+            className="shadow-lg shadow-primary/20 hover:scale-105 transition-all text-lg py-6"
           >
-            {showCreateForm ? 'Cancel' : '+ Add New Sweet'}
+            {showCreateForm ? 'Cancel Operation' : '+ Add New Sweet'}
           </Button>
         </div>
 
+        {/* Create/Edit Form */}
         {(showCreateForm || editingSweet) && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-3xl font-black mb-4">
-              {editingSweet ? 'Edit Sweet' : 'Create New Sweet'}
-            </h2>
-            <form onSubmit={editingSweet ? handleUpdate : handleCreate} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Name</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  minLength={2}
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
-                <input
-                  type="text"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  required
-                  minLength={2}
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Price</label>
-                  <input
+          <div className="glass p-8 rounded-3xl border border-white/10 animate-in slide-in-from-top-4">
+            <h3 className="text-2xl font-bold text-white mb-6">
+              {editingSweet ? 'Edit Sweet Details' : 'Add New Sweet'}
+            </h3>
+            <form onSubmit={editingSweet ? handleUpdate : handleCreate} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">Name</label>
+                  <Input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    className="bg-black/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">Category</label>
+                  <Input
+                    type="text"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    required
+                    className="bg-black/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">Price ($)</label>
+                  <Input
                     type="number"
                     step="0.01"
-                    min="0.01"
+                    min="0"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="bg-black/20"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Quantity</label>
-                  <input
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">Initial Quantity</label>
+                  <Input
                     type="number"
                     min="0"
                     value={formData.quantity}
                     onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="bg-black/20"
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button type="submit">
-                  {editingSweet ? 'Update' : 'Create'}
+              <div className="flex gap-4 pt-4">
+                <Button type="submit" className="flex-1 font-bold">
+                  {editingSweet ? 'Update Sweet' : 'Create Sweet'}
                 </Button>
-                {editingSweet && (
-                  <Button type="button" onClick={cancelEdit} variant="outline">
+                {(editingSweet || showCreateForm) && (
+                  <Button type="button" onClick={cancelEdit} variant="outline" className="flex-1 border-white/10 hover:bg-white/5">
                     Cancel
                   </Button>
                 )}
@@ -242,114 +229,95 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-3xl font-black mb-4">Search Sweets</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            <input
+        {/* Hero / Filter Section */}
+        <div className="glass p-8 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
+            <span className="text-9xl">🔍</span>
+          </div>
+
+          <h2 className="text-3xl font-black text-white mb-6 flex items-center gap-3">
+            Find Your <span className="text-primary">Craving</span>
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <Input
               type="text"
-              placeholder="Name"
+              placeholder="Search by name..."
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
-              className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-black/20 border-white/10"
             />
-            <input
+            <Input
               type="text"
-              placeholder="Category"
+              placeholder="Category..."
               value={searchCategory}
               onChange={(e) => setSearchCategory(e.target.value)}
-              className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-black/20 border-white/10"
             />
-            <input
+            <Input
               type="number"
               placeholder="Min Price"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
-              className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-black/20 border-white/10"
             />
-            <input
+            <Input
               type="number"
               placeholder="Max Price"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-black/20 border-white/10"
             />
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={handleSearch}>Search</Button>
-            <Button
-              onClick={() => {
-                setSearchName('');
-                setSearchCategory('');
-                setMinPrice('');
-                setMaxPrice('');
-                fetchSweets();
-              }}
-              variant="outline"
-            >
-              Clear
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={handleSearch} className="flex-1 font-bold shadow-lg shadow-primary/20">
+                Search
+              </Button>
+              <Button onClick={clearFilters} variant="secondary" className="px-4">
+                Clear
+              </Button>
+            </div>
           </div>
         </div>
 
-        {loading ? (
-          <div className="text-center py-8">Loading...</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sweets.map((sweet) => (
-              <div key={sweet._id} className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-4xl font-black mb-3 tracking-tight">{sweet.name}</h3>
-                <p className="text-xs font-light uppercase tracking-widest mb-2">
-                  {sweet.category}
-                </p>
-                <p className="text-5xl font-black text-green-600 mb-2 mono">
-                  ${sweet.price.toFixed(2)}
-                </p>
-                <p className="text-sm font-light mb-4 mono">
-                  Stock: {sweet.quantity} {sweet.quantity === 0 && '(Out of Stock)'}
-                </p>
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      min="1"
-                      max={sweet.quantity}
-                      value={purchaseQuantity[sweet._id] || 1}
-                      onChange={(e) =>
-                        setPurchaseQuantity({
-                          ...purchaseQuantity,
-                          [sweet._id]: parseInt(e.target.value) || 1,
-                        })
-                      }
-                      className="w-20 px-2 py-1 border rounded"
-                      disabled={sweet.quantity === 0}
-                    />
-                    <Button
-                      onClick={() => handlePurchase(sweet._id)}
-                      disabled={sweet.quantity === 0}
-                      className="flex-1"
-                    >
-                      Purchase
-                    </Button>
-                  </div>
-                  <Button
-                    onClick={() => startEdit(sweet)}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    Edit
-                  </Button>
-                </div>
-              </div>
-            ))}
+        {/* Error Display */}
+        {error && (
+          <div className="bg-destructive/10 text-destructive border border-destructive/20 p-4 rounded-xl font-medium animate-in fade-in slide-in-from-top-4 flex justify-between items-center">
+            <span>{error}</span>
+            <button onClick={() => setError('')} className="hover:bg-destructive/10 rounded p-1 transition-colors">✕</button>
           </div>
         )}
 
-        {!loading && sweets.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No sweets found
+        {/* Content Grid */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-96 rounded-3xl bg-white/5 animate-pulse" />
+            ))}
+          </div>
+        ) : sweets.length === 0 ? (
+          <div className="text-center py-24 glass rounded-3xl border border-white/5">
+            <div className="text-8xl mb-4 opacity-50">🧁</div>
+            <h3 className="text-2xl font-bold text-white mb-2">No sweets found</h3>
+            <p className="text-muted-foreground">Try adjusting your search criteria</p>
+            <Button onClick={clearFilters} variant="link" className="mt-4 text-primary">
+              View all sweets
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {sweets.map((sweet) => (
+              <SweetCard
+                key={sweet._id}
+                sweet={sweet}
+                onPurchase={handlePurchase}
+                onEdit={startEdit}
+                purchaseQuantity={purchaseQuantity[sweet._id] || 1}
+                setPurchaseQuantity={(q) => setPurchaseQuantity(prev => ({ ...prev, [sweet._id]: q }))}
+              />
+            ))}
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   );
 }

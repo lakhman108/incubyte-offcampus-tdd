@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { sweetsAPI } from '../services/api';
-import { Button } from '../components/ui/button';
 import type { Sweet } from '../types';
+import Layout from '../components/Layout';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/Input';
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminDashboard() {
   const [sweets, setSweets] = useState<Sweet[]>([]);
@@ -18,8 +19,7 @@ export default function AdminDashboard() {
     quantity: '',
   });
   const [restockData, setRestockData] = useState<{ [key: string]: number }>({});
-  const { user, token, logout } = useAuth();
-  const navigate = useNavigate();
+  const { token } = useAuth();
 
   const fetchSweets = async () => {
     if (!token) return;
@@ -113,111 +113,95 @@ export default function AdminDashboard() {
     setFormData({ name: '', category: '', price: '', quantity: '' });
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   useEffect(() => {
     fetchSweets();
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-5xl font-black tracking-tight">🍬 Admin Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-xs font-light tracking-wide uppercase">
-              {user?.username || user?.email} ({user?.role})
-            </span>
-            <Button onClick={() => navigate('/dashboard')} variant="outline">
-              Customer View
-            </Button>
-            <Button onClick={handleLogout} variant="outline">
-              Logout
-            </Button>
+    <Layout>
+      <div className="space-y-8">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-4xl font-black text-white tracking-tight">Inventory Management</h2>
+            <p className="text-muted-foreground mt-2">Manage your sweet collection and stock levels</p>
           </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded mb-4">
-            {error}
-            <button onClick={() => setError('')} className="ml-2 font-bold">×</button>
-          </div>
-        )}
-
-        <div className="mb-6">
           <Button
             onClick={() => {
               setShowCreateForm(!showCreateForm);
               setEditingSweet(null);
               setFormData({ name: '', category: '', price: '', quantity: '' });
             }}
+            className="shadow-lg shadow-primary/20 hover:scale-105 transition-all text-lg py-6"
           >
-            {showCreateForm ? 'Cancel' : '+ Add New Sweet'}
+            {showCreateForm ? 'Cancel Operation' : '+ Add New Sweet'}
           </Button>
         </div>
 
+        {error && (
+          <div className="bg-destructive/10 text-destructive border border-destructive/20 p-4 rounded-xl flex justify-between items-center">
+            {error}
+            <button onClick={() => setError('')} className="font-bold hover:bg-destructive/20 p-1 rounded">×</button>
+          </div>
+        )}
+
+        {/* Form Section */}
         {(showCreateForm || editingSweet) && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-3xl font-black mb-4">
-              {editingSweet ? 'Edit Sweet' : 'Create New Sweet'}
-            </h2>
-            <form onSubmit={editingSweet ? handleUpdate : handleCreate} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Name</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
-                <input
-                  type="text"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  required
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Price</label>
-                  <input
+          <div className="glass p-8 rounded-3xl border border-white/10 animate-in slide-in-from-top-4">
+            <h3 className="text-2xl font-bold text-white mb-6">
+              {editingSweet ? 'Edit Sweet Details' : 'Add New Sweet'}
+            </h3>
+            <form onSubmit={editingSweet ? handleUpdate : handleCreate} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">Name</label>
+                  <Input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    className="bg-black/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">Category</label>
+                  <Input
+                    type="text"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    required
+                    className="bg-black/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">Price ($)</label>
+                  <Input
                     type="number"
                     step="0.01"
                     min="0"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="bg-black/20"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Quantity</label>
-                  <input
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">Initial Quantity</label>
+                  <Input
                     type="number"
                     min="0"
                     value={formData.quantity}
                     onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="bg-black/20"
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button type="submit">
-                  {editingSweet ? 'Update' : 'Create'}
+              <div className="flex gap-4 pt-4">
+                <Button type="submit" className="flex-1 font-bold">
+                  {editingSweet ? 'Update Sweet' : 'Create Sweet'}
                 </Button>
                 {editingSweet && (
-                  <Button type="button" onClick={cancelEdit} variant="outline">
+                  <Button type="button" onClick={cancelEdit} variant="outline" className="flex-1 border-white/10 hover:bg-white/5">
                     Cancel
                   </Button>
                 )}
@@ -226,38 +210,53 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {loading ? (
-          <div className="text-center py-8">Loading...</div>
-        ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+        {/* Data Table */}
+        <div className="glass rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+          <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Restock</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+              <thead>
+                <tr className="border-b border-white/10 bg-white/5">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Product</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Price</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Stock Status</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Quick Restock</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-white/5">
                 {sweets.map((sweet) => (
-                  <tr key={sweet._id}>
-                    <td className="px-6 py-4">{sweet.name}</td>
-                    <td className="px-6 py-4 capitalize">{sweet.category}</td>
-                    <td className="px-6 py-4">${sweet.price.toFixed(2)}</td>
+                  <tr key={sweet._id} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4">
-                      {sweet.quantity}
-                      {sweet.quantity === 0 && (
-                        <span className="ml-2 text-red-600 text-xs">(Out)</span>
-                      )}
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-xl">
+                          🍬
+                        </div>
+                        <span className="font-bold text-white">{sweet.name}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <input
+                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-gray-300 border border-white/10">
+                        {sweet.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-mono text-primary">
+                      ${sweet.price.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className={`h-2 w-2 rounded-full ${sweet.quantity > 10 ? 'bg-emerald-500' : sweet.quantity > 0 ? 'bg-orange-500' : 'bg-red-500'}`} />
+                        <span className="text-sm text-gray-300">
+                          {sweet.quantity} units
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <Input
                           type="number"
                           min="1"
+                          placeholder="Qty"
                           value={restockData[sweet._id] || ''}
                           onChange={(e) =>
                             setRestockData({
@@ -265,31 +264,33 @@ export default function AdminDashboard() {
                               [sweet._id]: parseInt(e.target.value) || 0,
                             })
                           }
-                          placeholder="Qty"
-                          className="w-20 px-2 py-1 border rounded text-sm"
+                          className="h-8 w-20 bg-black/40 border-white/10 text-xs"
                         />
                         <Button
                           onClick={() => handleRestock(sweet._id)}
                           size="sm"
-                          variant="outline"
+                          variant="ghost"
+                          className="h-8 w-8 p-0Hover:bg-primary/20 text-primary"
                         >
                           +
                         </Button>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
                         <Button
                           onClick={() => startEdit(sweet)}
                           size="sm"
-                          variant="outline"
+                          variant="ghost"
+                          className="hover:text-primary hover:bg-primary/10"
                         >
                           Edit
                         </Button>
                         <Button
                           onClick={() => handleDelete(sweet._id)}
                           size="sm"
-                          variant="destructive"
+                          variant="ghost"
+                          className="hover:text-destructive hover:bg-destructive/10 text-muted-foreground"
                         >
                           Delete
                         </Button>
@@ -300,14 +301,13 @@ export default function AdminDashboard() {
               </tbody>
             </table>
           </div>
-        )}
-
-        {!loading && sweets.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No sweets available. Create your first sweet!
-          </div>
-        )}
+          {!loading && sweets.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No sweets found in inventory.</p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }
