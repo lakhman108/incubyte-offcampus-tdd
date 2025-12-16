@@ -8,7 +8,8 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "lint": "eslint .",
-    "format": "prettier --write \"src/**/*.js\""
+    "format": "prettier --write \"src/**/*.js\"",
+    "seed": "node src/seed.js"
   },
   "author": "",
   "license": "ISC",
